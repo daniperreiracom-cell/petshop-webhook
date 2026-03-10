@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const { google } = require('googleapis');
 
 const app = express();
@@ -94,7 +95,12 @@ async function createEvent(metadata) {
   }
 }
 
-/* 3. ROTA DE TESTE PARA GERAR PAGAMENTO */
+/* 3. PAGINA PARA O PET SHOP GERAR O LINK */
+app.get('/gerar-agendamento', (req, res) => {
+  return res.sendFile(path.join(__dirname, 'gerar-agendamento.html'));
+});
+
+/* 4. ROTA DE TESTE PARA GERAR PAGAMENTO */
 app.get('/gerar-pagamento-teste', async (req, res) => {
   try {
     console.log('🧪 Gerando pagamento de teste...');
@@ -140,7 +146,7 @@ app.get('/gerar-pagamento-teste', async (req, res) => {
   }
 });
 
-/* 4. NOVA ROTA PARA GERAR LINK REAL DO PETSHOP */
+/* 5. ROTA PARA GERAR LINK REAL DO PETSHOP */
 app.get('/gerar-link-petshop', async (req, res) => {
   try {
     const {
@@ -239,7 +245,7 @@ app.get('/gerar-link-petshop', async (req, res) => {
   }
 });
 
-/* 5. WEBHOOK MERCADO PAGO */
+/* 6. WEBHOOK MERCADO PAGO */
 app.post('/webhook/mp', async (req, res) => {
   try {
     console.log('📩 Webhook recebido do Mercado Pago.');
@@ -294,7 +300,7 @@ app.post('/webhook/mp', async (req, res) => {
   }
 });
 
-/* 6. ROTA RAIZ */
+/* 7. ROTA RAIZ */
 app.get('/', (req, res) => {
   res.send('Servidor Petshop Online!');
 });
