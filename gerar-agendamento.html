@@ -1,419 +1,223 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gerar Link de Agendamento - Pet Shop</title>
-  <style>
-    * { box-sizing: border-box; }
-    :root {
-      --bg1: #f4f8ff;
-      --bg2: #eefcf7;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --line: #dbe4ee;
-      --primary: #1d4ed8;
-      --primary-dark: #153ea7;
-      --success: #0f766e;
-      --danger: #b91c1c;
-      --soft: #f8fafc;
-      --shadow: 0 14px 38px rgba(15, 23, 42, 0.12);
-      --radius: 18px;
-    }
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      color: var(--text);
-      background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
-    }
-    .wrap {
-      min-height: 100vh;
-      padding: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .card {
-      width: 100%;
-      max-width: 760px;
-      background: var(--card);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.7);
-    }
-    .hero {
-      padding: 24px 22px 14px;
-      background: linear-gradient(135deg, #e0ecff 0%, #ecfff5 100%);
-      border-bottom: 1px solid var(--line);
-    }
-    .badge {
-      display: inline-block;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(29, 78, 216, 0.10);
-      color: var(--primary-dark);
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-    h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
-      line-height: 1.15;
-    }
-    .subtitle {
-      margin: 0;
-      color: #475569;
-      font-size: 15px;
-      line-height: 1.5;
-    }
-    .content {
-      padding: 20px 22px 24px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .field.full { grid-column: 1 / -1; }
-    label {
-      font-size: 14px;
-      font-weight: 700;
-      color: #334155;
-    }
-    input, button, textarea {
-      font: inherit;
-    }
-    input {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 13px 14px;
-      background: #fff;
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.10);
-    }
-    .tips {
-      margin: 18px 0 0;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: var(--soft);
-      border: 1px dashed var(--line);
-      color: #475569;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      margin-top: 18px;
-    }
-    button {
-      border: 0;
-      border-radius: 14px;
-      padding: 14px 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform .04s ease, opacity .2s ease, background .2s ease;
-    }
-    button:active { transform: translateY(1px); }
-    button:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-    .btn-success {
-      background: #dcfce7;
-      color: #166534;
-    }
-    .result {
-      margin-top: 22px;
-      padding: 16px;
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 18px;
-      display: none;
-    }
-    .result.show { display: block; }
-    .status {
-      margin-bottom: 10px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .status.ok { color: var(--success); }
-    .status.error { color: var(--danger); }
-    .link-box {
-      width: 100%;
-      min-height: 100px;
-      resize: vertical;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px;
-      background: #fff;
-      line-height: 1.4;
-    }
-    .helper {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .summary {
-      margin-top: 14px;
-      background: #fff;
-      border: 1px dashed var(--line);
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    .summary-title {
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #0f172a;
-    }
-    @media (max-width: 700px) {
-      .wrap {
-        padding: 10px;
-        align-items: flex-start;
-      }
-      .card {
-        border-radius: 18px;
-      }
-      .hero {
-        padding: 18px 16px 12px;
-      }
-      .content {
-        padding: 16px;
-      }
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      .actions {
-        grid-template-columns: 1fr;
-      }
-      h1 {
-        font-size: 24px;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gerar Link de Agendamento - Pet Shop</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#eef5ff,#f2fff7);color:#1f2937}
+.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
+.card{width:100%;max-width:760px;background:#fff;border-radius:22px;box-shadow:0 14px 38px rgba(0,0,0,.12);overflow:hidden}
+.hero{padding:22px;background:linear-gradient(135deg,#e7efff,#ecfff4);border-bottom:1px solid #e5e7eb}
+.hero h1{margin:0 0 6px;font-size:28px}
+.hero p{margin:0;color:#475569;font-size:14px}
+.content{padding:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+label{font-size:14px;font-weight:700}
+input{border:1px solid #d1d5db;border-radius:12px;padding:12px;font-size:15px}
+input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr;margin-top:18px;gap:10px}
+button{border:0;border-radius:12px;padding:13px;font-weight:700;cursor:pointer}
+.btn-primary{background:#2563eb;color:white}
+.btn-copy{background:#e5e7eb}
+.btn-whatsapp{background:#dcfce7;color:#166534}
+.result{margin-top:22px;padding:16px;background:#f9fafb;border-radius:16px;border:1px solid #e5e7eb;display:none}
+.result.show{display:block}
+.status{font-weight:700;margin-bottom:10px}
+.status.ok{color:#0f766e}
+.status.error{color:#b91c1c}
+.link-box{width:100%;min-height:90px;border:1px solid #d1d5db;border-radius:12px;padding:12px;margin-top:8px}
+.big-open{
+margin-top:14px;
+display:block;
+text-align:center;
+padding:16px;
+border-radius:14px;
+font-weight:800;
+background:#22c55e;
+color:white;
+text-decoration:none;
+font-size:16px
+}
+.summary{margin-top:14px;background:white;border:1px dashed #d1d5db;border-radius:12px;padding:12px;font-size:14px}
+@media(max-width:700px){
+.grid{grid-template-columns:1fr}
+.actions{grid-template-columns:1fr}
+.hero h1{font-size:22px}
+}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="hero">
-        <div class="badge">Agendamento com pagamento automático</div>
-        <h1>Gerar link de agendamento</h1>
-        <p class="subtitle">Preencha os dados abaixo, gere o link de pagamento e envie para o cliente. Quando o pagamento for aprovado, o evento poderá ser salvo automaticamente no Google Agenda.</p>
-      </div>
+<div class="wrap">
+<div class="card">
 
-      <div class="content">
-        <form id="formAgendamento">
-          <div class="grid">
-            <div class="field">
-              <label for="dono">Nome do dono</label>
-              <input type="text" id="dono" name="dono" placeholder="Ex: Maria da Silva" required />
-            </div>
+<div class="hero">
+<h1>Gerar link de agendamento</h1>
+<p>Preencha os dados e gere o link de pagamento para enviar ao cliente.</p>
+</div>
 
-            <div class="field">
-              <label for="telefone">Telefone</label>
-              <input type="text" id="telefone" name="telefone" placeholder="Ex: 11999999999" />
-            </div>
+<div class="content">
 
-            <div class="field">
-              <label for="pet">Nome do pet</label>
-              <input type="text" id="pet" name="pet" placeholder="Ex: Rex" required />
-            </div>
+<form id="formAgendamento">
 
-            <div class="field">
-              <label for="servico">Serviço</label>
-              <input type="text" id="servico" name="servico" placeholder="Ex: Banho e Tosa" required />
-            </div>
+<div class="grid">
 
-            <div class="field">
-              <label for="data">Data</label>
-              <input type="date" id="data" name="data" required />
-            </div>
+<div class="field">
+<label>Nome do dono</label>
+<input type="text" id="dono" required>
+</div>
 
-            <div class="field">
-              <label for="hora">Hora</label>
-              <input type="time" id="hora" name="hora" required />
-            </div>
+<div class="field">
+<label>Telefone</label>
+<input type="text" id="telefone" placeholder="11999999999">
+</div>
 
-            <div class="field full">
-              <label for="valor">Valor</label>
-              <input type="number" id="valor" name="valor" step="0.01" min="0.01" placeholder="Ex: 80.00" required />
-            </div>
-          </div>
+<div class="field">
+<label>Nome do pet</label>
+<input type="text" id="pet" required>
+</div>
 
-          <div class="tips">
-            Dica: depois de gerar o link, você pode copiar e enviar pelo WhatsApp. No celular, também será possível abrir o WhatsApp já com uma mensagem pronta.
-          </div>
+<div class="field">
+<label>Serviço</label>
+<input type="text" id="servico" required>
+</div>
 
-          <div class="actions">
-            <button type="submit" class="btn-primary" id="btnGerar">Gerar link</button>
-            <button type="button" class="btn-secondary" id="btnCopiar" disabled>Copiar link</button>
-            <button type="button" class="btn-success" id="btnWhatsapp" disabled>Enviar no WhatsApp</button>
-          </div>
-        </form>
+<div class="field">
+<label>Data</label>
+<input type="date" id="data" required>
+</div>
 
-        <div class="result" id="resultado">
-          <div class="status" id="statusMensagem"></div>
-          <textarea id="linkGerado" class="link-box" readonly placeholder="O link gerado aparecerá aqui..."></textarea>
-          <div class="helper">Depois de gerar, copie o link ou toque em “Enviar no WhatsApp”.</div>
-          <div class="summary" id="resumoAgendamento"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="field">
+<label>Hora</label>
+<input type="time" id="hora" required>
+</div>
 
-  <script>
-    const form = document.getElementById('formAgendamento');
-    const resultado = document.getElementById('resultado');
-    const statusMensagem = document.getElementById('statusMensagem');
-    const linkGerado = document.getElementById('linkGerado');
-    const btnGerar = document.getElementById('btnGerar');
-    const btnCopiar = document.getElementById('btnCopiar');
-    const btnWhatsapp = document.getElementById('btnWhatsapp');
-    const resumoAgendamento = document.getElementById('resumoAgendamento');
+<div class="field full">
+<label>Valor</label>
+<input type="number" id="valor" step="0.01" required>
+</div>
 
-    function mostrarResultado(tipo, mensagem) {
-      resultado.classList.add('show');
-      statusMensagem.className = 'status ' + tipo;
-      statusMensagem.textContent = mensagem;
-    }
+</div>
 
-    function formatarValor(valor) {
-      const numero = Number(valor || 0);
-      return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
+<div class="actions">
+<button class="btn-primary" type="submit" id="btnGerar">Gerar link</button>
+<button type="button" class="btn-copy" id="btnCopiar" disabled>Copiar link</button>
+<button type="button" class="btn-whatsapp" id="btnWhatsapp" disabled>Enviar WhatsApp</button>
+</div>
 
-    function formatarDataBR(dataIso) {
-      if (!dataIso) return '';
-      const partes = dataIso.split('-');
-      if (partes.length !== 3) return dataIso;
-      return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    }
+</form>
 
-    function pegarDadosFormulario() {
-      return {
-        dono: document.getElementById('dono').value.trim(),
-        telefone: document.getElementById('telefone').value.trim(),
-        pet: document.getElementById('pet').value.trim(),
-        servico: document.getElementById('servico').value.trim(),
-        data: document.getElementById('data').value,
-        hora: document.getElementById('hora').value,
-        valor: document.getElementById('valor').value
-      };
-    }
+<div class="result" id="resultado">
 
-    function montarResumo(dados) {
-      return `
-        <div class="summary-title">Resumo do agendamento</div>
-        Dono: ${dados.dono}<br>
-        Telefone: ${dados.telefone || 'Não informado'}<br>
-        Pet: ${dados.pet}<br>
-        Serviço: ${dados.servico}<br>
-        Data: ${formatarDataBR(dados.data)}<br>
-        Hora: ${dados.hora}<br>
-        Valor: ${formatarValor(dados.valor)}
-      `;
-    }
+<div class="status" id="statusMensagem"></div>
 
-    function montarMensagemWhatsapp(dados, link) {
-      return `Olá! Segue o link de pagamento do agendamento:%0A%0A` +
-        `Dono: ${dados.dono}%0A` +
-        `Pet: ${dados.pet}%0A` +
-        `Serviço: ${dados.servico}%0A` +
-        `Data: ${formatarDataBR(dados.data)}%0A` +
-        `Hora: ${dados.hora}%0A` +
-        `Valor: ${formatarValor(dados.valor)}%0A%0A` +
-        `Link para pagamento:%0A${encodeURIComponent(link)}`;
-    }
+<textarea id="linkGerado" class="link-box" readonly></textarea>
 
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
+<a id="abrirPagamento" class="big-open" target="_blank" style="display:none">Abrir pagamento</a>
 
-      btnGerar.disabled = true;
-      btnGerar.textContent = 'Gerando...';
-      btnCopiar.disabled = true;
-      btnWhatsapp.disabled = true;
-      linkGerado.value = '';
-      resumoAgendamento.innerHTML = '';
-      mostrarResultado('ok', 'Gerando link de pagamento...');
+<div class="summary" id="resumo"></div>
 
-      const dados = pegarDadosFormulario();
+</div>
 
-      try {
-        const params = new URLSearchParams(dados);
-        const response = await fetch(`/gerar-link-petshop?${params.toString()}`);
-        const result = await response.json();
+</div>
+</div>
+</div>
 
-        if (!response.ok) {
-          throw new Error(result.erro || 'Erro ao gerar o link.');
-        }
+<script>
 
-        linkGerado.value = result.link_pagamento || '';
-        resumoAgendamento.innerHTML = montarResumo(dados);
-        mostrarResultado('ok', 'Link gerado com sucesso.');
-        btnCopiar.disabled = !result.link_pagamento;
-        btnWhatsapp.disabled = !result.link_pagamento;
-      } catch (error) {
-        mostrarResultado('error', error.message || 'Erro ao gerar o link.');
-      } finally {
-        btnGerar.disabled = false;
-        btnGerar.textContent = 'Gerar link';
-      }
-    });
+const form=document.getElementById('formAgendamento')
+const resultado=document.getElementById('resultado')
+const statusMensagem=document.getElementById('statusMensagem')
+const linkGerado=document.getElementById('linkGerado')
+const btnCopiar=document.getElementById('btnCopiar')
+const btnWhatsapp=document.getElementById('btnWhatsapp')
+const abrirPagamento=document.getElementById('abrirPagamento')
+const resumo=document.getElementById('resumo')
 
-    btnCopiar.addEventListener('click', async function () {
-      try {
-        await navigator.clipboard.writeText(linkGerado.value);
-        mostrarResultado('ok', 'Link copiado com sucesso.');
-      } catch (error) {
-        linkGerado.select();
-        document.execCommand('copy');
-        mostrarResultado('ok', 'Link copiado com sucesso.');
-      }
-    });
+function dados(){
+return{
+dono:document.getElementById('dono').value.trim(),
+telefone:document.getElementById('telefone').value.trim(),
+pet:document.getElementById('pet').value.trim(),
+servico:document.getElementById('servico').value.trim(),
+data:document.getElementById('data').value,
+hora:document.getElementById('hora').value,
+valor:document.getElementById('valor').value
+}
+}
 
-    btnWhatsapp.addEventListener('click', function () {
-      const link = linkGerado.value.trim();
-      if (!link) {
-        mostrarResultado('error', 'Gere o link primeiro.');
-        return;
-      }
+function resumoTexto(d){
+return `Dono: ${d.dono}<br>Pet: ${d.pet}<br>Serviço: ${d.servico}<br>Data: ${d.data}<br>Hora: ${d.hora}<br>Valor: R$ ${d.valor}`
+}
 
-      const dados = pegarDadosFormulario();
-      const telefone = (dados.telefone || '').replace(/\D/g, '');
-      const mensagem = montarMensagemWhatsapp(dados, link);
+form.addEventListener('submit',async e=>{
 
-      let url = `https://wa.me/?text=${mensagem}`;
-      if (telefone) {
-        url = `https://wa.me/55${telefone}?text=${mensagem}`;
-      }
+ e.preventDefault()
 
-      window.open(url, '_blank');
-    });
-  </script>
+ statusMensagem.innerText="Gerando link de pagamento..."
+ statusMensagem.className="status"
+ resultado.classList.add("show")
+
+ const d=dados()
+
+ try{
+
+ const params=new URLSearchParams(d)
+
+ const r=await fetch(`/gerar-link-petshop?${params.toString()}`)
+
+ const j=await r.json()
+
+ if(!r.ok) throw new Error(j.erro||"Erro ao gerar")
+
+ linkGerado.value=j.link_pagamento
+
+ abrirPagamento.href=j.link_pagamento
+ abrirPagamento.style.display="block"
+
+ btnCopiar.disabled=false
+ btnWhatsapp.disabled=false
+
+ statusMensagem.innerText="Link gerado com sucesso"
+ statusMensagem.className="status ok"
+
+ resumo.innerHTML=resumoTexto(d)
+
+ }catch(err){
+
+ statusMensagem.innerText=err.message
+ statusMensagem.className="status error"
+
+ }
+
+})
+
+btnCopiar.onclick=()=>{
+navigator.clipboard.writeText(linkGerado.value)
+statusMensagem.innerText="Link copiado"
+}
+
+btnWhatsapp.onclick=()=>{
+
+const d=dados()
+const link=linkGerado.value
+
+let tel=d.telefone.replace(/\D/g,'')
+
+let msg=`Agendamento confirmado:%0A%0APet: ${d.pet}%0AServiço: ${d.servico}%0AData: ${d.data}%0AHora: ${d.hora}%0AValor: R$ ${d.valor}%0A%0APagar:%0A${link}`
+
+let url="https://wa.me/?text="+msg
+
+if(tel) url=`https://wa.me/55${tel}?text=${msg}`
+
+window.open(url,'_blank')
+
+}
+
+</script>
+
 </body>
 </html>
