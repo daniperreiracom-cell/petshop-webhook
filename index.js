@@ -40,6 +40,12 @@ async function createEvent(metadata) {
     }
 
     const start = new Date(metadata.start_time);
+
+    if (isNaN(start.getTime())) {
+      console.error('❌ Data inválida em metadata.start_time:', metadata.start_time);
+      return null;
+    }
+
     const end = new Date(start.getTime() + 60 * 60 * 1000);
 
     const calendarId = process.env.PETSHOP_EMAIL;
@@ -79,7 +85,11 @@ async function createEvent(metadata) {
 
     return result.data;
   } catch (error) {
-    console.error('❌ Erro ao criar evento no Google Calendar:', error.response?.data || error.message);
+    const details = error && error.response && error.response.data
+      ? error.response.data
+      : error.message;
+
+    console.error('❌ Erro ao criar evento no Google Calendar:', details);
     return null;
   }
 }
@@ -130,7 +140,106 @@ app.get('/gerar-pagamento-teste', async (req, res) => {
   }
 });
 
-/* 4. WEBHOOK MERCADO PAGO */
+/* 4. NOVA ROTA PARA GERAR LINK REAL DO PETSHOP */
+app.get('/gerar-link-petshop', async (req, res) => {
+  try {
+    const {
+      pet,
+      dono,
+      telefone,
+      servico,
+      data,
+      hora,
+      valor
+    } = req.query;
+
+    if (!pet || !dono || !servico || !data || !hora || !valor) {
+      return res.status(400).json({
+        erro: 'Parâmetros obrigatórios: pet, dono, servico, data, hora, valor'
+      });
+    }
+
+    const valorNumerico = Number(valor);
+
+    if (isNaN(valorNumerico) || valorNumerico <= 0) {
+      return res.status(400).json({
+        erro: 'O parâmetro valor deve ser numérico e maior que zero.'
+      });
+    }
+
+    const startTime = `${data}T${hora}:00-03:00`;
+
+    console.log('🐶 Gerando link petshop com os dados:');
+    console.log({
+      pet,
+      dono,
+      telefone,
+      servico,
+      data,
+      hora,
+      valor: valorNumerico,
+      start_time: startTime
+    });
+
+    const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        items: [
+          {
+            title: `PetShop - ${servico} (${pet})`,
+            quantity: 1,
+            unit_price: valorNumerico,
+            currency_id: 'BRL'
+          }
+        ],
+        notification_url: 'https://project-7wgxx.vercel.app/webhook/mp',
+        metadata: {
+          start_time: startTime,
+          service: servico,
+          pet_name: pet,
+          owner_name: dono,
+          phone: telefone || ''
+        }
+      })
+    });
+
+    const preference = await response.json();
+
+    console.log('📨 Resposta Mercado Pago link petshop:', preference);
+
+    if (!preference.init_point) {
+      return res.status(500).json({
+        erro: 'Erro ao gerar pagamento no Mercado Pago.',
+        detalhes: preference
+      });
+    }
+
+    return res.json({
+      mensagem: 'Link gerado com sucesso',
+      link_pagamento: preference.init_point,
+      dados_agendamento: {
+        pet,
+        dono,
+        telefone: telefone || '',
+        servico,
+        data,
+        hora,
+        valor: valorNumerico
+      }
+    });
+  } catch (err) {
+    console.error('❌ Erro ao gerar pagamento do petshop:', err.message);
+    return res.status(500).json({
+      erro: 'Erro interno ao gerar link de pagamento.'
+    });
+  }
+});
+
+/* 5. WEBHOOK MERCADO PAGO */
 app.post('/webhook/mp', async (req, res) => {
   try {
     console.log('📩 Webhook recebido do Mercado Pago.');
@@ -176,12 +285,16 @@ app.post('/webhook/mp', async (req, res) => {
 
     return res.status(200).send('OK');
   } catch (err) {
-    console.error('❌ Erro no processamento do webhook:', err.response?.data || err.message);
+    const details = err && err.response && err.response.data
+      ? err.response.data
+      : err.message;
+
+    console.error('❌ Erro no processamento do webhook:', details);
     return res.status(200).send('OK');
   }
 });
 
-/* 5. ROTA RAIZ */
+/* 6. ROTA RAIZ */
 app.get('/', (req, res) => {
   res.send('Servidor Petshop Online!');
 });
