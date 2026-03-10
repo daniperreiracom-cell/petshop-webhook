@@ -5,43 +5,90 @@ const app = express();
 
 app.use(express.json());
 
-// 1. CONFIGURAÇÃO GOOGLE CALENDAR
-let calendar;
+/* 1. CONFIGURACAO GOOGLE CALENDAR */
+let calendar = null;
+
 try {
-  const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
-  const auth = new google.auth.GoogleAuth({
-    credentials,
-    scopes: ['https://www.googleapis.com/auth/calendar']
-  });
-  calendar = google.calendar({ version: 'v3', auth });
-  console.log("✅ Google Calendar pronto.");
+  if (!process.env.GOOGLE_SERVICE_ACCOUNT) {
+    console.error('❌ Variável GOOGLE_SERVICE_ACCOUNT não encontrada.');
+  } else {
+    const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
+
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/calendar']
+    });
+
+    calendar = google.calendar({ version: 'v3', auth });
+    console.log('✅ Google Calendar pronto.');
+  }
 } catch (e) {
-  console.error("❌ Erro nas credenciais do Google.");
+  console.error('❌ Erro nas credenciais do Google:', e.message);
 }
 
-// 2. FUNÇÃO PARA CRIAR O EVENTO NA AGENDA
+/* 2. FUNCAO PARA CRIAR O EVENTO NA AGENDA */
 async function createEvent(metadata) {
-  if (!calendar) return;
-  
-  const start = new Date(metadata.start_time);
-  const end = new Date(start.getTime() + 60 * 60 * 1000); // 1h de duração
+  try {
+    if (!calendar) {
+      console.error('❌ Google Calendar não foi inicializado.');
+      return null;
+    }
 
-  const event = {
-    summary: `🐾 PET: ${metadata.pet_name} (${metadata.service})`,
-    description: `Dono: ${metadata.owner_name}\nTelefone: ${metadata.phone}\nPagamento aprovado via Mercado Pago.`,
-    start: { dateTime: start.toISOString(), timeZone: 'America/Sao_Paulo' },
-    end: { dateTime: end.toISOString(), timeZone: 'America/Sao_Paulo' },
-  };
+    if (!metadata || !metadata.start_time) {
+      console.error('❌ Metadata inválido ou sem start_time:', metadata);
+      return null;
+    }
 
-  return calendar.events.insert({
-    calendarId: process.env.PETSHOP_EMAIL || 'primary',
-    resource: event
-  });
+    const start = new Date(metadata.start_time);
+    const end = new Date(start.getTime() + 60 * 60 * 1000);
+
+    const calendarId = process.env.PETSHOP_EMAIL;
+
+    if (!calendarId) {
+      console.error('❌ Variável PETSHOP_EMAIL não definida.');
+      return null;
+    }
+
+    const event = {
+      summary: `🐾 PET: ${metadata.pet_name || 'Sem nome'} (${metadata.service || 'Serviço'})`,
+      description:
+        `Dono: ${metadata.owner_name || 'Não informado'}\n` +
+        `Telefone: ${metadata.phone || 'Não informado'}\n` +
+        `Pagamento aprovado via Mercado Pago.`,
+      start: {
+        dateTime: start.toISOString(),
+        timeZone: 'America/Sao_Paulo'
+      },
+      end: {
+        dateTime: end.toISOString(),
+        timeZone: 'America/Sao_Paulo'
+      }
+    };
+
+    console.log('📅 Tentando criar evento no Google Calendar...');
+    console.log('📌 Calendar ID:', calendarId);
+    console.log('📌 Evento:', JSON.stringify(event, null, 2));
+
+    const result = await calendar.events.insert({
+      calendarId: calendarId,
+      resource: event
+    });
+
+    console.log('✅ Evento criado com sucesso no Google Calendar.');
+    console.log('🔗 Event ID:', result.data.id);
+
+    return result.data;
+  } catch (error) {
+    console.error('❌ Erro ao criar evento no Google Calendar:', error.response?.data || error.message);
+    return null;
+  }
 }
 
-// 3. ROTA DE TESTE (Passo 3 do seu cenário: Gerar o link de R$ 1,00)
+/* 3. ROTA DE TESTE PARA GERAR PAGAMENTO */
 app.get('/gerar-pagamento-teste', async (req, res) => {
   try {
+    console.log('🧪 Gerando pagamento de teste...');
+
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
       headers: {
@@ -49,47 +96,94 @@ app.get('/gerar-pagamento-teste', async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        items: [{ title: "Serviço PetShop Teste", quantity: 1, unit_price: 1.00, currency_id: "BRL" }],
-        notification_url: "https://project-7wgxx.vercel.app/webhook/mp",
+        items: [
+          {
+            title: 'Serviço PetShop Teste',
+            quantity: 1,
+            unit_price: 1.00,
+            currency_id: 'BRL'
+          }
+        ],
+        notification_url: 'https://project-7wgxx.vercel.app/webhook/mp',
         metadata: {
-          start_time: "2026-03-15T14:00:00.000-03:00", // Data do serviço
-          service: "Banho e Tosa",
-          pet_name: "Rex Teste",
-          owner_name: "Cliente Exemplo",
-          phone: "11999999999"
+          start_time: '2026-03-15T14:00:00.000-03:00',
+          service: 'Banho e Tosa',
+          pet_name: 'Rex Teste',
+          owner_name: 'Cliente Exemplo',
+          phone: '11999999999'
         }
       })
     });
+
     const preference = await response.json();
-    res.redirect(preference.init_point); // Manda o cliente para o pagamento
+
+    console.log('📨 Resposta Mercado Pago preferência:', preference);
+
+    if (!preference.init_point) {
+      return res.status(500).send('❌ Mercado Pago não retornou init_point. Verifique o token e a resposta da API.');
+    }
+
+    return res.redirect(preference.init_point);
   } catch (error) {
-    res.send("Erro ao gerar link: " + error.message);
+    console.error('❌ Erro ao gerar link de pagamento:', error.message);
+    return res.status(500).send('Erro ao gerar link: ' + error.message);
   }
 });
 
-// 4. WEBHOOK (Passo 5 do seu cenário: Receber a confirmação e agendar)
+/* 4. WEBHOOK MERCADO PAGO */
 app.post('/webhook/mp', async (req, res) => {
-  const { action, data } = req.body;
+  try {
+    console.log('📩 Webhook recebido do Mercado Pago.');
+    console.log('📦 Body recebido:', JSON.stringify(req.body, null, 2));
 
-  if (action === 'payment.created' || action === 'payment.updated') {
-    try {
-      // Busca detalhes do pagamento para pegar o nome do pet e data que estão no metadata
+    const { action, data } = req.body;
+
+    if (!action || !data || !data.id) {
+      console.log('⚠️ Webhook sem action ou data.id. Ignorando.');
+      return res.status(200).send('OK');
+    }
+
+    if (action === 'payment.created' || action === 'payment.updated') {
+      console.log(`🔎 Consultando pagamento ${data.id} no Mercado Pago...`);
+
       const resMP = await fetch(`https://api.mercadopago.com/v1/payments/${data.id}`, {
-        headers: { 'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}` }
+        headers: {
+          'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`
+        }
       });
+
       const payment = await resMP.json();
 
+      console.log('💳 Dados do pagamento:', JSON.stringify(payment, null, 2));
+      console.log('📌 Status do pagamento:', payment.status);
+
       if (payment.status === 'approved') {
-        console.log("💰 Pagamento aprovado! Agendando...");
-        await createEvent(payment.metadata);
+        console.log('💰 Pagamento aprovado! Agendando no Google Calendar...');
+
+        const createdEvent = await createEvent(payment.metadata);
+
+        if (createdEvent) {
+          console.log('✅ Agendamento concluído com sucesso.');
+        } else {
+          console.log('⚠️ Pagamento aprovado, mas o evento não foi criado.');
+        }
+      } else {
+        console.log(`ℹ️ Pagamento ainda não aprovado. Status atual: ${payment.status}`);
       }
-    } catch (err) {
-      console.error("Erro no processamento:", err);
+    } else {
+      console.log(`ℹ️ Ação recebida e ignorada: ${action}`);
     }
+
+    return res.status(200).send('OK');
+  } catch (err) {
+    console.error('❌ Erro no processamento do webhook:', err.response?.data || err.message);
+    return res.status(200).send('OK');
   }
-  res.status(200).send('OK');
 });
 
-app.get('/', (req, res) => res.send('Servidor Petshop Online!'));
+/* 5. ROTA RAIZ */
+app.get('/', (req, res) => {
+  res.send('Servidor Petshop Online!');
+});
 
 module.exports = app;
