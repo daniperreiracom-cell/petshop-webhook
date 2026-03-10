@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerar Link de Agendamento - Pet Shop</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #f7fafc 0%, #eef6ff 100%);
+      color: #1f2937;
+    }
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.10);
+      padding: 22px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+    .subtitle {
+      margin: 0 0 22px;
+      color: #4b5563;
+      font-size: 15px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field.full { grid-column: 1 / -1; }
+    label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #374151;
+    }
+    input, select, button, textarea {
+      font: inherit;
+    }
+    input, select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #fff;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    input:focus, select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .04s ease, opacity .2s ease;
+    }
+    button:active { transform: translateY(1px); }
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+      min-width: 180px;
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    .result {
+      margin-top: 22px;
+      padding: 16px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      display: none;
+    }
+    .result.show { display: block; }
+    .status {
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .status.ok { color: #065f46; }
+    .status.error { color: #991b1b; }
+    .link-box {
+      width: 100%;
+      min-height: 88px;
+      resize: vertical;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+    }
+    .helper {
+      margin-top: 8px;
+      color: #6b7280;
+      font-size: 13px;
+    }
+    .summary {
+      margin-top: 14px;
+      background: #fff;
+      border: 1px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    @media (max-width: 640px) {
+      .card {
+        padding: 18px;
+        border-radius: 16px;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      h1 { font-size: 24px; }
+      .btn-primary, .btn-secondary {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Gerar link de agendamento</h1>
+      <p class="subtitle">Página simples para o pet shop gerar o link de pagamento e enviar para o cliente pelo celular ou computador.</p>
+
+      <form id="formAgendamento">
+        <div class="grid">
+          <div class="field">
+            <label for="dono">Nome do dono</label>
+            <input type="text" id="dono" name="dono" placeholder="Ex: Maria da Silva" required />
+          </div>
+
+          <div class="field">
+            <label for="telefone">Telefone</label>
+            <input type="text" id="telefone" name="telefone" placeholder="Ex: 11999999999" />
+          </div>
+
+          <div class="field">
+            <label for="pet">Nome do pet</label>
+            <input type="text" id="pet" name="pet" placeholder="Ex: Rex" required />
+          </div>
+
+          <div class="field">
+            <label for="servico">Serviço</label>
+            <input type="text" id="servico" name="servico" placeholder="Ex: Banho e Tosa" required />
+          </div>
+
+          <div class="field">
+            <label for="data">Data</label>
+            <input type="date" id="data" name="data" required />
+          </div>
+
+          <div class="field">
+            <label for="hora">Hora</label>
+            <input type="time" id="hora" name="hora" required />
+          </div>
+
+          <div class="field full">
+            <label for="valor">Valor</label>
+            <input type="number" id="valor" name="valor" step="0.01" min="0.01" placeholder="Ex: 80.00" required />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary" id="btnGerar">Gerar link</button>
+          <button type="button" class="btn-secondary" id="btnCopiar" disabled>Copiar link</button>
+        </div>
+      </form>
+
+      <div class="result" id="resultado">
+        <div class="status" id="statusMensagem"></div>
+        <textarea id="linkGerado" class="link-box" readonly placeholder="O link gerado aparecerá aqui..."></textarea>
+        <div class="helper" id="helperTexto">Depois de gerar, copie o link e envie para o cliente no WhatsApp.</div>
+        <div class="summary" id="resumoAgendamento"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('formAgendamento');
+    const resultado = document.getElementById('resultado');
+    const statusMensagem = document.getElementById('statusMensagem');
+    const linkGerado = document.getElementById('linkGerado');
+    const btnGerar = document.getElementById('btnGerar');
+    const btnCopiar = document.getElementById('btnCopiar');
+    const resumoAgendamento = document.getElementById('resumoAgendamento');
+
+    function mostrarResultado(tipo, mensagem) {
+      resultado.classList.add('show');
+      statusMensagem.className = 'status ' + tipo;
+      statusMensagem.textContent = mensagem;
+    }
+
+    function formatarValor(valor) {
+      const numero = Number(valor || 0);
+      return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function montarResumo(dados) {
+      return `Dono: ${dados.dono}<br>
+              Telefone: ${dados.telefone || 'Não informado'}<br>
+              Pet: ${dados.pet}<br>
+              Serviço: ${dados.servico}<br>
+              Data: ${dados.data}<br>
+              Hora: ${dados.hora}<br>
+              Valor: ${formatarValor(dados.valor)}`;
+    }
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      btnGerar.disabled = true;
+      btnGerar.textContent = 'Gerando...';
+      btnCopiar.disabled = true;
+      linkGerado.value = '';
+      resumoAgendamento.innerHTML = '';
+      mostrarResultado('ok', 'Gerando link de pagamento...');
+
+      const dados = {
+        dono: document.getElementById('dono').value.trim(),
+        telefone: document.getElementById('telefone').value.trim(),
+        pet: document.getElementById('pet').value.trim(),
+        servico: document.getElementById('servico').value.trim(),
+        data: document.getElementById('data').value,
+        hora: document.getElementById('hora').value,
+        valor: document.getElementById('valor').value
+      };
+
+      try {
+        const params = new URLSearchParams(dados);
+        const response = await fetch(`/gerar-link-petshop?${params.toString()}`);
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.erro || 'Erro ao gerar o link.');
+        }
+
+        linkGerado.value = result.link_pagamento || '';
+        resumoAgendamento.innerHTML = montarResumo(dados);
+        mostrarResultado('ok', 'Link gerado com sucesso.');
+        btnCopiar.disabled = !result.link_pagamento;
+      } catch (error) {
+        mostrarResultado('error', error.message || 'Erro ao gerar o link.');
+      } finally {
+        btnGerar.disabled = false;
+        btnGerar.textContent = 'Gerar link';
+      }
+    });
+
+    btnCopiar.addEventListener('click', async function () {
+      try {
+        await navigator.clipboard.writeText(linkGerado.value);
+        mostrarResultado('ok', 'Link copiado com sucesso.');
+      } catch (error) {
+        linkGerado.select();
+        document.execCommand('copy');
+        mostrarResultado('ok', 'Link copiado com sucesso.');
+      }
+    });
+  </script>
+</body>
+</html>
