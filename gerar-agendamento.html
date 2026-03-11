@@ -6,47 +6,159 @@
 <title>Gerar Link de Agendamento - Pet Shop</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#eef5ff,#f2fff7);color:#1f2937}
-.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
-.card{width:100%;max-width:760px;background:#fff;border-radius:22px;box-shadow:0 14px 38px rgba(0,0,0,.12);overflow:hidden}
-.hero{padding:22px;background:linear-gradient(135deg,#e7efff,#ecfff4);border-bottom:1px solid #e5e7eb}
-.hero h1{margin:0 0 6px;font-size:28px}
-.hero p{margin:0;color:#475569;font-size:14px}
-.content{padding:20px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.field{display:flex;flex-direction:column;gap:6px}
-.field.full{grid-column:1/-1}
-label{font-size:14px;font-weight:700}
-input{border:1px solid #d1d5db;border-radius:12px;padding:12px;font-size:15px}
-input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.15)}
-.actions{display:grid;grid-template-columns:1fr 1fr 1fr;margin-top:18px;gap:10px}
-button{border:0;border-radius:12px;padding:13px;font-weight:700;cursor:pointer}
-.btn-primary{background:#2563eb;color:white}
-.btn-copy{background:#e5e7eb}
-.btn-whatsapp{background:#dcfce7;color:#166534}
-.result{margin-top:22px;padding:16px;background:#f9fafb;border-radius:16px;border:1px solid #e5e7eb;display:none}
-.result.show{display:block}
-.status{font-weight:700;margin-bottom:10px}
-.status.ok{color:#0f766e}
-.status.error{color:#b91c1c}
-.link-box{width:100%;min-height:90px;border:1px solid #d1d5db;border-radius:12px;padding:12px;margin-top:8px}
-.big-open{
-margin-top:14px;
-display:block;
-text-align:center;
-padding:16px;
-border-radius:14px;
-font-weight:800;
-background:#22c55e;
-color:white;
-text-decoration:none;
-font-size:16px
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(180deg,#eef5ff,#f2fff7);
+  color:#1f2937
 }
-.summary{margin-top:14px;background:white;border:1px dashed #d1d5db;border-radius:12px;padding:12px;font-size:14px}
+.wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px
+}
+.card{
+  width:100%;
+  max-width:760px;
+  background:#fff;
+  border-radius:22px;
+  box-shadow:0 14px 38px rgba(0,0,0,.12);
+  overflow:hidden
+}
+.hero{
+  padding:22px;
+  background:linear-gradient(135deg,#e7efff,#ecfff4);
+  border-bottom:1px solid #e5e7eb
+}
+.hero h1{
+  margin:0 0 6px;
+  font-size:28px
+}
+.hero p{
+  margin:0;
+  color:#475569;
+  font-size:14px;
+  line-height:1.5
+}
+.content{
+  padding:20px
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px
+}
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px
+}
+.field.full{
+  grid-column:1/-1
+}
+label{
+  font-size:14px;
+  font-weight:700
+}
+input,select{
+  border:1px solid #d1d5db;
+  border-radius:12px;
+  padding:12px;
+  font-size:15px;
+  width:100%;
+  background:#fff
+}
+input:focus,select:focus{
+  outline:none;
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.15)
+}
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  margin-top:18px;
+  gap:10px
+}
+button{
+  border:0;
+  border-radius:12px;
+  padding:13px;
+  font-weight:700;
+  cursor:pointer
+}
+.btn-primary{
+  background:#2563eb;
+  color:white
+}
+.btn-copy{
+  background:#e5e7eb
+}
+.btn-whatsapp{
+  background:#dcfce7;
+  color:#166534
+}
+.result{
+  margin-top:22px;
+  padding:16px;
+  background:#f9fafb;
+  border-radius:16px;
+  border:1px solid #e5e7eb;
+  display:none
+}
+.result.show{
+  display:block
+}
+.status{
+  font-weight:700;
+  margin-bottom:10px
+}
+.status.ok{
+  color:#0f766e
+}
+.status.error{
+  color:#b91c1c
+}
+.link-box{
+  width:100%;
+  min-height:90px;
+  border:1px solid #d1d5db;
+  border-radius:12px;
+  padding:12px;
+  margin-top:8px
+}
+.big-open{
+  margin-top:14px;
+  display:block;
+  text-align:center;
+  padding:16px;
+  border-radius:14px;
+  font-weight:800;
+  background:#22c55e;
+  color:white;
+  text-decoration:none;
+  font-size:16px
+}
+.summary{
+  margin-top:14px;
+  background:white;
+  border:1px dashed #d1d5db;
+  border-radius:12px;
+  padding:12px;
+  font-size:14px;
+  line-height:1.6
+}
 @media(max-width:700px){
-.grid{grid-template-columns:1fr}
-.actions{grid-template-columns:1fr}
-.hero h1{font-size:22px}
+  .grid{
+    grid-template-columns:1fr
+  }
+  .actions{
+    grid-template-columns:1fr
+  }
+  .hero h1{
+    font-size:22px
+  }
 }
 </style>
 </head>
@@ -56,7 +168,7 @@ font-size:16px
 
 <div class="hero">
 <h1>Gerar link de agendamento</h1>
-<p>Preencha os dados e gere o link de pagamento para enviar ao cliente.</p>
+<p>Preencha os dados, escolha se o pagamento poderá ser parcelado e gere o link para enviar ao cliente.</p>
 </div>
 
 <div class="content">
@@ -66,38 +178,46 @@ font-size:16px
 <div class="grid">
 
 <div class="field">
-<label>Nome do dono</label>
+<label for="dono">Nome do dono</label>
 <input type="text" id="dono" required>
 </div>
 
 <div class="field">
-<label>Telefone</label>
+<label for="telefone">Telefone</label>
 <input type="text" id="telefone" placeholder="11999999999">
 </div>
 
 <div class="field">
-<label>Nome do pet</label>
+<label for="pet">Nome do pet</label>
 <input type="text" id="pet" required>
 </div>
 
 <div class="field">
-<label>Serviço</label>
+<label for="servico">Serviço</label>
 <input type="text" id="servico" required>
 </div>
 
 <div class="field">
-<label>Data</label>
+<label for="data">Data</label>
 <input type="date" id="data" required>
 </div>
 
 <div class="field">
-<label>Hora</label>
+<label for="hora">Hora</label>
 <input type="time" id="hora" required>
 </div>
 
 <div class="field full">
-<label>Valor</label>
-<input type="number" id="valor" step="0.01" required>
+<label for="valor">Valor</label>
+<input type="number" id="valor" step="0.01" min="0.01" required>
+</div>
+
+<div class="field full">
+<label for="parcelamento">Permitir parcelamento?</label>
+<select id="parcelamento">
+  <option value="nao" selected>Não</option>
+  <option value="sim">Sim</option>
+</select>
 </div>
 
 </div>
@@ -127,96 +247,122 @@ font-size:16px
 </div>
 
 <script>
-
-const form=document.getElementById('formAgendamento')
-const resultado=document.getElementById('resultado')
-const statusMensagem=document.getElementById('statusMensagem')
-const linkGerado=document.getElementById('linkGerado')
-const btnCopiar=document.getElementById('btnCopiar')
-const btnWhatsapp=document.getElementById('btnWhatsapp')
-const abrirPagamento=document.getElementById('abrirPagamento')
-const resumo=document.getElementById('resumo')
+const form = document.getElementById('formAgendamento');
+const resultado = document.getElementById('resultado');
+const statusMensagem = document.getElementById('statusMensagem');
+const linkGerado = document.getElementById('linkGerado');
+const btnCopiar = document.getElementById('btnCopiar');
+const btnWhatsapp = document.getElementById('btnWhatsapp');
+const abrirPagamento = document.getElementById('abrirPagamento');
+const resumo = document.getElementById('resumo');
 
 function dados(){
-return{
-dono:document.getElementById('dono').value.trim(),
-telefone:document.getElementById('telefone').value.trim(),
-pet:document.getElementById('pet').value.trim(),
-servico:document.getElementById('servico').value.trim(),
-data:document.getElementById('data').value,
-hora:document.getElementById('hora').value,
-valor:document.getElementById('valor').value
+  return{
+    dono:document.getElementById('dono').value.trim(),
+    telefone:document.getElementById('telefone').value.trim(),
+    pet:document.getElementById('pet').value.trim(),
+    servico:document.getElementById('servico').value.trim(),
+    data:document.getElementById('data').value,
+    hora:document.getElementById('hora').value,
+    valor:document.getElementById('valor').value,
+    parcelamento:document.getElementById('parcelamento').value
+  };
 }
+
+function formatarData(dataIso){
+  if(!dataIso) return '';
+  const partes = dataIso.split('-');
+  if(partes.length !== 3) return dataIso;
+  return partes[2] + '/' + partes[1] + '/' + partes[0];
 }
 
 function resumoTexto(d){
-return `Dono: ${d.dono}<br>Pet: ${d.pet}<br>Serviço: ${d.servico}<br>Data: ${d.data}<br>Hora: ${d.hora}<br>Valor: R$ ${d.valor}`
+  return `Dono: ${d.dono}<br>
+  Telefone: ${d.telefone || 'Não informado'}<br>
+  Pet: ${d.pet}<br>
+  Serviço: ${d.servico}<br>
+  Data: ${formatarData(d.data)}<br>
+  Hora: ${d.hora}<br>
+  Valor: R$ ${d.valor}<br>
+  Parcelamento: ${d.parcelamento === 'sim' ? 'Permitido' : 'Bloqueado'}`;
 }
 
-form.addEventListener('submit',async e=>{
+form.addEventListener('submit', async e => {
+  e.preventDefault();
 
- e.preventDefault()
+  statusMensagem.innerText = 'Gerando link de pagamento...';
+  statusMensagem.className = 'status';
+  resultado.classList.add('show');
 
- statusMensagem.innerText="Gerando link de pagamento..."
- statusMensagem.className="status"
- resultado.classList.add("show")
+  const d = dados();
 
- const d=dados()
+  try{
+    const params = new URLSearchParams(d);
 
- try{
+    const r = await fetch(`/gerar-link-petshop?${params.toString()}`);
+    const j = await r.json();
 
- const params=new URLSearchParams(d)
+    if(!r.ok) throw new Error(j.erro || 'Erro ao gerar link');
 
- const r=await fetch(`/gerar-link-petshop?${params.toString()}`)
+    linkGerado.value = j.link_pagamento || '';
+    abrirPagamento.href = j.link_pagamento || '#';
+    abrirPagamento.style.display = j.link_pagamento ? 'block' : 'none';
 
- const j=await r.json()
+    btnCopiar.disabled = !j.link_pagamento;
+    btnWhatsapp.disabled = !j.link_pagamento;
 
- if(!r.ok) throw new Error(j.erro||"Erro ao gerar")
+    statusMensagem.innerText = 'Link gerado com sucesso';
+    statusMensagem.className = 'status ok';
 
- linkGerado.value=j.link_pagamento
+    resumo.innerHTML = resumoTexto(d);
 
- abrirPagamento.href=j.link_pagamento
- abrirPagamento.style.display="block"
+  }catch(err){
+    statusMensagem.innerText = err.message || 'Erro ao gerar link';
+    statusMensagem.className = 'status error';
+    abrirPagamento.style.display = 'none';
+    btnCopiar.disabled = true;
+    btnWhatsapp.disabled = true;
+  }
+});
 
- btnCopiar.disabled=false
- btnWhatsapp.disabled=false
+btnCopiar.onclick = async () => {
+  try{
+    await navigator.clipboard.writeText(linkGerado.value);
+    statusMensagem.innerText = 'Link copiado';
+    statusMensagem.className = 'status ok';
+  }catch(e){
+    linkGerado.select();
+    document.execCommand('copy');
+    statusMensagem.innerText = 'Link copiado';
+    statusMensagem.className = 'status ok';
+  }
+};
 
- statusMensagem.innerText="Link gerado com sucesso"
- statusMensagem.className="status ok"
+btnWhatsapp.onclick = () => {
+  const d = dados();
+  const link = linkGerado.value;
 
- resumo.innerHTML=resumoTexto(d)
+  let tel = (d.telefone || '').replace(/\D/g, '');
 
- }catch(err){
+  let msg =
+    `Olá! Segue o link de pagamento do agendamento:%0A%0A` +
+    `Dono: ${d.dono}%0A` +
+    `Pet: ${d.pet}%0A` +
+    `Serviço: ${d.servico}%0A` +
+    `Data: ${formatarData(d.data)}%0A` +
+    `Hora: ${d.hora}%0A` +
+    `Valor: R$ ${d.valor}%0A` +
+    `Parcelamento: ${d.parcelamento === 'sim' ? 'Permitido' : 'Bloqueado'}%0A%0A` +
+    `Link para pagamento:%0A${encodeURIComponent(link)}`;
 
- statusMensagem.innerText=err.message
- statusMensagem.className="status error"
+  let url = 'https://wa.me/?text=' + msg;
 
- }
+  if(tel){
+    url = `https://wa.me/55${tel}?text=${msg}`;
+  }
 
-})
-
-btnCopiar.onclick=()=>{
-navigator.clipboard.writeText(linkGerado.value)
-statusMensagem.innerText="Link copiado"
-}
-
-btnWhatsapp.onclick=()=>{
-
-const d=dados()
-const link=linkGerado.value
-
-let tel=d.telefone.replace(/\D/g,'')
-
-let msg=`Agendamento confirmado:%0A%0APet: ${d.pet}%0AServiço: ${d.servico}%0AData: ${d.data}%0AHora: ${d.hora}%0AValor: R$ ${d.valor}%0A%0APagar:%0A${link}`
-
-let url="https://wa.me/?text="+msg
-
-if(tel) url=`https://wa.me/55${tel}?text=${msg}`
-
-window.open(url,'_blank')
-
-}
-
+  window.open(url, '_blank');
+};
 </script>
 
 </body>
