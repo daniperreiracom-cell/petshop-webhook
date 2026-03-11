@@ -145,7 +145,6 @@ app.get('/gerar-pagamento-teste', async (req, res) => {
     return res.status(500).send('Erro ao gerar link: ' + error.message);
   }
 });
-
 /* 5. ROTA PARA GERAR LINK REAL DO PETSHOP */
 app.get('/gerar-link-petshop', async (req, res) => {
   try {
@@ -156,7 +155,8 @@ app.get('/gerar-link-petshop', async (req, res) => {
       servico,
       data,
       hora,
-      valor
+      valor,
+      parcelamento
     } = req.query;
 
     if (!pet || !dono || !servico || !data || !hora || !valor) {
@@ -174,6 +174,7 @@ app.get('/gerar-link-petshop', async (req, res) => {
     }
 
     const startTime = `${data}T${hora}:00-03:00`;
+    const permitirParcelamento = String(parcelamento || '').toLowerCase() === 'sim';
 
     console.log('🐶 Gerando link petshop com os dados:');
     console.log({
@@ -184,8 +185,36 @@ app.get('/gerar-link-petshop', async (req, res) => {
       data,
       hora,
       valor: valorNumerico,
-      start_time: startTime
+      start_time: startTime,
+      parcelamento: permitirParcelamento ? 'sim' : 'nao'
     });
+
+    const bodyMP = {
+      items: [
+        {
+          title: `PetShop - ${servico} (${pet})`,
+          quantity: 1,
+          unit_price: valorNumerico,
+          currency_id: 'BRL'
+        }
+      ],
+      notification_url: 'https://project-7wgxx.vercel.app/webhook/mp',
+      metadata: {
+        start_time: startTime,
+        service: servico,
+        pet_name: pet,
+        owner_name: dono,
+        phone: telefone || '',
+        parcelamento: permitirParcelamento ? 'sim' : 'nao'
+      }
+    };
+
+    /* se NAO permitir parcelamento, limita para 1x */
+    if (!permitirParcelamento) {
+      bodyMP.payment_methods = {
+        installments: 1
+      };
+    }
 
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
@@ -193,24 +222,7 @@ app.get('/gerar-link-petshop', async (req, res) => {
         'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        items: [
-          {
-            title: `PetShop - ${servico} (${pet})`,
-            quantity: 1,
-            unit_price: valorNumerico,
-            currency_id: 'BRL'
-          }
-        ],
-        notification_url: 'https://project-7wgxx.vercel.app/webhook/mp',
-        metadata: {
-          start_time: startTime,
-          service: servico,
-          pet_name: pet,
-          owner_name: dono,
-          phone: telefone || ''
-        }
-      })
+      body: JSON.stringify(bodyMP)
     });
 
     const preference = await response.json();
@@ -234,7 +246,8 @@ app.get('/gerar-link-petshop', async (req, res) => {
         servico,
         data,
         hora,
-        valor: valorNumerico
+        valor: valorNumerico,
+        parcelamento: permitirParcelamento ? 'sim' : 'nao'
       }
     });
   } catch (err) {
