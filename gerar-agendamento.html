@@ -351,8 +351,7 @@ btnWhatsapp.onclick = () => {
     `Serviço: ${d.servico}%0A` +
     `Data: ${formatarData(d.data)}%0A` +
     `Hora: ${d.hora}%0A` +
-    `Valor: R$ ${d.valor}%0A` +
-    `Parcelamento: ${d.parcelamento === 'sim' ? 'Permitido' : 'Bloqueado'}%0A%0A` +
+    `Valor: R$ ${d.valor}%0A%0A` +
     `Link para pagamento:%0A${encodeURIComponent(link)}`;
 
   let url = 'https://wa.me/?text=' + msg;
